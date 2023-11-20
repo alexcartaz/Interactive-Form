@@ -150,6 +150,21 @@ form.addEventListener('submit', (e) => {
     }
 });
 
+// -----
+// Activity checkbox focus
+// -----
 
+let checkboxes = document.querySelectorAll("input[type='checkbox']");
+//for each checkbox...
+for(const checkbox of checkboxes){
+    //add event handler to add focus
+    checkbox.addEventListener("focus", (e) =>{
+        checkbox.parentElement.classList.add("focus");
+    });
+    //add event handelr to remove focus
+    checkbox.addEventListener("blur", (e) => {
+        checkbox.parentElement.classList.remove("focus");
+    });
+}
 
 
