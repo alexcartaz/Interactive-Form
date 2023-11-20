@@ -1,16 +1,18 @@
 // *****
 // FORM INITIALIZATION AND DYNAMIC LOGIC
 
+
+//focus name field
+document.querySelector("#name").focus();
+let isPayingWithCC = true;
+
 // -----
 // TITLE LOGIC
 // -----
 
-//focus name field
-document.querySelector("#name").focus();
 //hide other job role by default
 let otherJobRoleTextElement = document.querySelector("#other-job-role");
 otherJobRoleTextElement.style.display='none';
-
 //title drop down menu selections
 let titleDropDownMenu = document.querySelector("#title");
 titleDropDownMenu.addEventListener("change", (e) => {
@@ -176,7 +178,7 @@ function formValidation(){
     let nameValidation = /[a-zA-Z]/.test(name);
     let email = document.querySelector("#email").value;
     //email is at least _@_.__ or _@_.___
-    let emailValidation = /[^\s@]+@[^\s@]+\.[^\s@]{2,3}/.test(email);
+    let emailValidation = /[^\s@]+@[^\s@]+\.[^\s@]{2,3}$/.test(email);
     //at least 1 activity selected
     let activityValidation = false;
     if(activitiesSelected > 0){
@@ -186,9 +188,10 @@ function formValidation(){
     let creditCardValidation = true;
 
     //determine if cc is payment method (this is an important conditional for several things)
-    let isPayingWithCC = false;
     if(paymentInfo['credit-card'].style.display === 'block'){
         isPayingWithCC = true;
+    }else{
+        isPayingWithCC = false;
     }
 
     //if paying with cc, perform cc specific validations
@@ -218,6 +221,31 @@ function formValidation(){
     return false;
 }
 
+// -----
+// All Keyup Validation Listeners
+// -----
+
+//name
+document.querySelector("#name").addEventListener("keyup", (e) => {
+    formValidation();
+});
+//email
+document.querySelector("#email").addEventListener("keyup", (e) => {
+    formValidation();
+});
+if(isPayingWithCC){
+    document.querySelector("#cc-num").addEventListener("keyup", (e) => {
+        formValidation();
+    });
+    document.querySelector("#zip").addEventListener("keyup", (e) => {
+        formValidation();
+    });
+    document.querySelector("#cvv").addEventListener("keyup", (e) => {
+        formValidation();
+    });
+}
+
+// final validation on form submission attempt
 let form = document.querySelectorAll('form')[0];
 form.addEventListener('submit', (e) => {
     console.log('submission attempt')
