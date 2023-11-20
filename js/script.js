@@ -42,3 +42,24 @@ designSelector.addEventListener("change", (e) => {
         }
     }
 });
+
+// total cost
+let activitiesFieldSet = document.querySelector('#activities');
+
+// changes handler
+activitiesFieldSet.addEventListener('change', (e) => {
+    //on any change we reset total to 0
+    let total = 0;
+    let activitiesLabels = document.querySelector('#activities-box').children;
+
+    //loop through all options and sum total of checked activities
+    for(const label of activitiesLabels){
+        let checkbox = label.children[0];
+        if(checkbox.checked){
+            total+=Number(checkbox.getAttribute('data-cost'));
+        }
+    }
+    //update new total displayed to user
+    document.querySelector('#activities-cost').innerHTML = "Total: $" + total;
+});
+
