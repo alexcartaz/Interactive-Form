@@ -9,7 +9,7 @@ document.querySelector("#name").focus();
 let otherJobRoleTextElement = document.querySelector("#other-job-role");
 otherJobRoleTextElement.style.display='none';
 
-//drop down menu selections
+//title drop down menu selections
 let titleDropDownMenu = document.querySelector("#title");
 titleDropDownMenu.addEventListener("change", (e) => {
 
@@ -22,3 +22,23 @@ titleDropDownMenu.addEventListener("change", (e) => {
 
 });
 
+//color initialization
+let colorSelection = document.querySelector("#color");
+colorSelection.disabled = true;
+
+//color enablement upon design motif selection
+let designSelector = document.querySelector("#design");
+designSelector.addEventListener("change", (e) => {
+
+    //if design moitif selected, color selection is now enabled
+    colorSelection.disabled = false;
+
+    //iterate over every possible color option and only display those matching chosen motif
+    for (const option of colorSelection.children){
+        if(option.getAttribute("data-theme") === e.target.value){
+            option.style.display = 'block';
+        }else{
+            option.style.display = 'none';
+        }
+    }
+});
