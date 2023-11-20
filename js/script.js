@@ -54,19 +54,59 @@ designSelector.addEventListener("change", (e) => {
 
 let activitiesFieldSet = document.querySelector('#activities');
 let activitiesSelected = 0;
+let activitySchedule = {
+    "Tuesday 9am-12pm": false,
+    "Tuesday 1pm-4pm": false,
+    "Wednesday 9am-12pm": false,
+    "Wednesday 1pm-4pm": false
+};
 // changes handler
 activitiesFieldSet.addEventListener('change', (e) => {
     //on any change we reset total to 0
     let total = 0;
     let activitiesLabels = document.querySelector('#activities-box').children;
     activitiesSelected = 0;
+
+    //update selected schedule
+    //if selection has a specifcied time
+    if(e.target.getAttribute("name") != "all"){
+        //if checked, include in schedule
+        if(e.target.checked === true){
+            activitySchedule[e.target.parentElement.children[2].innerHTML] = true;
+        }else{
+            //if unchecked, remove from schedule
+            activitySchedule[e.target.parentElement.children[2].innerHTML] = false;
+        }
+    }
+
     //loop through all options and sum total of checked activities
+    // also hide any lectures conflicting in time slot with any activities already selected
     for(const label of activitiesLabels){
+       
         let checkbox = label.children[0];
         if(checkbox.checked){
+            //total cost
             total+=Number(checkbox.getAttribute('data-cost'));
             activitiesSelected++;
+        }else{
+            //if unchecked and has a day/time
+            if(label.getAttribute("name")!="all"){
+                //if this activity's day/time is taken
+                if(activitySchedule[label.children[2].innerHTML]){
+                    //disable this duplicate
+                    label.classList.add("disabled");
+                    checkbox.disabled = true;
+                }else{
+                    //otw make sure this is not disabled as no activity for this day/time has been selected by user
+                    label.classList.remove("disabled");
+                    checkbox.disabled = false;
+                }
+            }
         }
+        if(activitySchedule[label.children[2].innerHTML]){
+            label.classList.add("disabled");
+        }
+
     }
     //update new total displayed to user
     document.querySelector('#activities-cost').innerHTML = "Total: $" + total;
