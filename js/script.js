@@ -1,8 +1,9 @@
 console.log('test');
 
 
-// Initialization of form
+// FORM INITIALIZATION AND DYNAMIC LOGIC
 
+// TITLE LOGIC
 //focus name field
 document.querySelector("#name").focus();
 //hide other job role by default
@@ -22,7 +23,7 @@ titleDropDownMenu.addEventListener("change", (e) => {
 
 });
 
-//color initialization
+// COLOR SELECTION LOGIC
 let colorSelection = document.querySelector("#color");
 colorSelection.disabled = true;
 
@@ -43,7 +44,7 @@ designSelector.addEventListener("change", (e) => {
     }
 });
 
-// total cost
+// TOTAL ACTIVITY COST LOGIC
 let activitiesFieldSet = document.querySelector('#activities');
 
 // changes handler
@@ -61,5 +62,30 @@ activitiesFieldSet.addEventListener('change', (e) => {
     }
     //update new total displayed to user
     document.querySelector('#activities-cost').innerHTML = "Total: $" + total;
+});
+
+// PAYMENT LOGIC
+
+// defaults
+// credit card selected
+document.querySelector("#payment").children[1].selected = true;
+// other payment flows hidden
+let paymentInfo = {
+    'credit-card': document.querySelector('#credit-card'),
+    'paypal': document.querySelector('#paypal'),
+    'bitcoin': document.querySelector('#bitcoin')
+}
+paymentInfo['paypal'].style.display = 'none';
+paymentInfo['bitcoin'].style.display = 'none';
+
+//listen to changes
+let paymentSelection = document.querySelector('#payment');
+paymentSelection.addEventListener('change', (e) => {
+    //hide all payment info
+    paymentInfo['credit-card'].style.display = 'none';
+    paymentInfo['paypal'].style.display = 'none';
+    paymentInfo['bitcoin'].style.display = 'none';
+    //make visible the selected payment info
+    paymentInfo[e.target.value].style.display = 'block'; 
 });
 
