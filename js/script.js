@@ -104,6 +104,32 @@ paymentSelection.addEventListener('change', (e) => {
 // FORM VALIDATION
 // -----
 
+//function that abstracts validation and hints
+function applyValidClass(element, valid, hint){
+    if(valid){
+        element.classList.remove("not-valid");
+        element.classList.add("valid");
+        hint.style.visibility = "hidden";
+    }else{
+        element.classList.add("not-valid");
+        element.classList.remove("valid");
+        hint.style.visibility = "visible";
+    }
+}
+
+//toggle correct labels for each required frield based on specifications, including hints
+function applyValidationLabels(nameValidation, emailValidation, activityValidation, isPayingWithCC, cNumValidation, zipValidation, cvvValidation){
+    applyValidClass(document.querySelector("#name").parentElement, nameValidation, document.querySelector("#name-hint"));
+    applyValidClass(document.querySelector("#email").parentElement, emailValidation, document.querySelector("#email-hint"));
+    applyValidClass(document.querySelector("#activities"), activityValidation, document.querySelector("#activities-hint"));
+    if(isPayingWithCC){
+        applyValidClass(document.querySelector("#cc-num").parentElement, cNumValidation, document.querySelector("#cc-hint"));
+        applyValidClass(document.querySelector("#zip").parentElement, zipValidation, document.querySelector("#zip-hint"));
+        applyValidClass(document.querySelector("#cvv").parentElement, cvvValidation, document.querySelector("#cvv-hint"));
+    }
+
+};
+
 function formValidation(){
     let name = document.querySelector("#name").value;
     //name has at least 1 letter
@@ -118,22 +144,34 @@ function formValidation(){
     }
     //validation if credit card is selected payment option
     let creditCardValidation = true;
-    //if credit card is selected payment method (otw we have nothing to validate)
+
+    //determine if cc is payment method (this is an important conditional for several things)
+    let isPayingWithCC = false;
     if(paymentInfo['credit-card'].style.display === 'block'){
+        isPayingWithCC = true;
+    }
+
+    //if paying with cc, perform cc specific validations
+    let cNumValidation, zipValidation, cvvValidation;
+    if(isPayingWithCC){
 
         let cNumber = document.querySelector("#cc-num").value;
         let zipCode = document.querySelector("#zip").value;
         let CVV = document.querySelector("#cvv").value;
 
-        let cNumValidation = /^\d{13,16}$/.test(cNumber);
-        let zipValidation = /^\d{5}$/.test(zipCode);
-        let cvvValidation = /^\d{3}$/.test(CVV);
+        cNumValidation = /^\d{13,16}$/.test(cNumber);
+        zipValidation = /^\d{5}$/.test(zipCode);
+        cvvValidation = /^\d{3}$/.test(CVV);
 
         if(!(cNumValidation && zipValidation && cvvValidation)){
             creditCardValidation = false;
         }
     }
+    
+    //apply validation labels
+    applyValidationLabels(nameValidation, emailValidation, activityValidation, isPayingWithCC, cNumValidation, zipValidation, cvvValidation);
 
+    //apply final validation check
     if( nameValidation && emailValidation && activityValidation && creditCardValidation ){
         return true;
     }
