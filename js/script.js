@@ -112,6 +112,8 @@ activitiesFieldSet.addEventListener('change', (e) => {
     }
     //update new total displayed to user
     document.querySelector('#activities-cost').innerHTML = "Total: $" + total;
+    //update real time form validation
+    formValidation();
 });
 
 // -----
@@ -147,22 +149,30 @@ paymentSelection.addEventListener('change', (e) => {
 // -----
 
 //function that abstracts validation and hints
-function applyValidClass(element, valid, hint){
+//hintText is optional; currently only conditionally used for email
+function applyValidClass(element, valid, hint, hintText = ''){
     if(valid){
         element.classList.remove("not-valid");
         element.classList.add("valid");
-        hint.style.visibility = "hidden";
+        console.log('1')
+        hint.style.display = "none";
     }else{
         element.classList.add("not-valid");
         element.classList.remove("valid");
-        hint.style.visibility = "visible";
+        console.log('2')
+        hint.style.display = "block";
+        //if hintText is passed into function and if hint is displayed, update hint text
+        if(hintText != ''){
+            hint.innerHTML = hintText;
+        }
     }
 }
 
 //toggle correct labels for each required frield based on specifications, including hints
-function applyValidationLabels(nameValidation, emailValidation, activityValidation, isPayingWithCC, cNumValidation, zipValidation, cvvValidation){
+function applyValidationLabels(nameValidation, emailValidation, emailHintText, activityValidation, isPayingWithCC, cNumValidation, zipValidation, cvvValidation){
+
     applyValidClass(document.querySelector("#name").parentElement, nameValidation, document.querySelector("#name-hint"));
-    applyValidClass(document.querySelector("#email").parentElement, emailValidation, document.querySelector("#email-hint"));
+    applyValidClass(document.querySelector("#email").parentElement, emailValidation, document.querySelector("#email-hint"), emailHintText);
     applyValidClass(document.querySelector("#activities"), activityValidation, document.querySelector("#activities-hint"));
     if(isPayingWithCC){
         applyValidClass(document.querySelector("#cc-num").parentElement, cNumValidation, document.querySelector("#cc-hint"));
@@ -172,6 +182,25 @@ function applyValidationLabels(nameValidation, emailValidation, activityValidati
 
 };
 
+//takes each validation component for email input string and updates the hint text with whatever requirement is missing, from 0-4
+function generateEmailHintText(eV_pre, eV_at, eV_website, eV_domain){
+    let msg = "Email address must be formatted correctly:<br>{username}@{website}.{domain}<br>";
+    if(!eV_pre){
+        msg += '<br>-missing {username}  (eg john.smith)'
+    }
+    if(!eV_at){
+        msg += '<br>-missing @ symbol';
+    }
+    if(!eV_website){
+        msg += '<br>-missing {website}  (eg apple)';
+    }
+    if(!eV_domain){
+        msg += '<br>-missing {domain}  (eg .net or .com)';
+    }
+    return msg;
+}
+
+//performs all validation of required fields from user
 function formValidation(){
     let name = document.querySelector("#name").value;
     //name has at least 1 letter
@@ -179,6 +208,13 @@ function formValidation(){
     let email = document.querySelector("#email").value;
     //email is at least _@_.__ or _@_.___
     let emailValidation = /[^\s@]+@[^\s@]+\.[^\s@]{2,3}$/.test(email);
+    let eV_pre = /^[^\s@]+/.test(email);
+    let eV_at = /@/.test(email);
+    let eV_website = /@[^\s@.]+\./.test(email);
+    let eV_domain = /\.[^\s@]{2,3}$/.test(email);
+    //generate piecemeal validation text hints
+    let emailHintText = generateEmailHintText(eV_pre, eV_at, eV_website, eV_domain);
+
     //at least 1 activity selected
     let activityValidation = false;
     if(activitiesSelected > 0){
@@ -212,7 +248,7 @@ function formValidation(){
     }
     
     //apply validation labels
-    applyValidationLabels(nameValidation, emailValidation, activityValidation, isPayingWithCC, cNumValidation, zipValidation, cvvValidation);
+    applyValidationLabels(nameValidation, emailValidation, emailHintText, activityValidation, isPayingWithCC, cNumValidation, zipValidation, cvvValidation);
 
     //apply final validation check
     if( nameValidation && emailValidation && activityValidation && creditCardValidation ){
@@ -233,6 +269,7 @@ document.querySelector("#name").addEventListener("keyup", (e) => {
 document.querySelector("#email").addEventListener("keyup", (e) => {
     formValidation();
 });
+//cc, if it is selected payment option
 if(isPayingWithCC){
     document.querySelector("#cc-num").addEventListener("keyup", (e) => {
         formValidation();
@@ -244,6 +281,8 @@ if(isPayingWithCC){
         formValidation();
     });
 }
+//activity selection
+
 
 // final validation on form submission attempt
 let form = document.querySelectorAll('form')[0];
